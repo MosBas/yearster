@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yearster - משחק ניחוש שנת שירים</title>
+  <meta name="description" content="Yearster - האזינו לשיר ונחשו באיזו שנה הוא יצא!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&family=Inter:wght@300;400;600;700;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="bg-effects">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ===== SCREEN 1: REGISTRATION ===== -->
+  <div id="screen-register" class="screen active">
+    <div class="container">
+      <div class="logo-section">
+        <h1 class="logo">
+          <span class="logo-icon">🎵</span>
+          <span class="logo-text">YEARSTER</span>
+        </h1>
+        <p class="tagline">נחשו את השנה. נצחו את החברים.</p>
+      </div>
+
+      <div class="card glass">
+        <h2 class="card-title">שמות השחקנים</h2>
+        <div class="players-form">
+          <div class="player-input-row">
+            <span class="player-number">1</span>
+            <input type="text" id="player-1" class="player-input" placeholder="שחקן 1" maxlength="15"
+              autocomplete="off">
+          </div>
+          <div class="player-input-row">
+            <span class="player-number">2</span>
+            <input type="text" id="player-2" class="player-input" placeholder="שחקן 2" maxlength="15"
+              autocomplete="off">
+          </div>
+          <div class="player-input-row">
+            <span class="player-number">3</span>
+            <input type="text" id="player-3" class="player-input" placeholder="שחקן 3 (אופציונלי)" maxlength="15"
+              autocomplete="off">
+          </div>
+          <div class="player-input-row">
+            <span class="player-number">4</span>
+            <input type="text" id="player-4" class="player-input" placeholder="שחקן 4 (אופציונלי)" maxlength="15"
+              autocomplete="off">
+          </div>
+        </div>
+        <button id="btn-start" class="btn btn-primary btn-large" onclick="startGame()">
+          <span class="btn-text">🎶 התחילו לשחק!</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 2: GAME ===== -->
+  <div id="screen-game" class="screen">
+    <div class="container">
+      <!-- Top bar: round & scores -->
+      <div class="game-top-bar">
+        <div class="round-info glass-sm">
+          <span class="round-label">סיבוב</span>
+          <span id="round-number" class="round-num">1</span>
+          <span class="round-of">מתוך 10</span>
+        </div>
+        <div id="scoreboard-mini" class="scoreboard-mini"></div>
+      </div>
+
+      <!-- Current player banner -->
+      <div id="current-player-banner" class="current-player-banner glass">
+        <div class="player-avatar" id="player-avatar">🎤</div>
+        <div class="player-turn-info">
+          <span class="turn-label">התור של</span>
+          <span id="current-player-name" class="turn-name">שחקן</span>
+        </div>
+      </div>
+
+      <!-- Spotify Player -->
+      <div class="spotify-container glass">
+        <div id="spotify-embed" class="spotify-embed">
+          <!-- iframe will be injected here -->
+        </div>
+        <div id="song-cover" class="song-cover">
+          <div class="song-cover-text">🎵 מה השיר?</div>
+        </div>
+      </div>
+
+      <!-- Year Guess Section -->
+      <div id="guess-section" class="guess-section glass">
+        <label class="guess-label">באיזו שנה יצא השיר?</label>
+        <div class="year-slider-container">
+          <span class="year-bound">1970</span>
+          <input type="range" id="year-slider" class="year-slider" min="1970" max="2025" value="2000" step="1">
+          <span class="year-bound">2025</span>
+        </div>
+        <div class="year-display-container">
+          <span id="year-display" class="year-display">2000</span>
+        </div>
+        <button id="btn-guess" class="btn btn-primary" onclick="submitGuess()">
+          <span class="btn-text">🎯 נחש!</span>
+        </button>
+      </div>
+
+      <!-- Result Section (hidden until guess) -->
+      <div id="result-section" class="result-section glass" style="display:none;">
+        <div id="result-emoji" class="result-emoji">🎯</div>
+        <div id="result-text" class="result-text"></div>
+        <div class="result-details">
+          <div class="result-row">
+            <span class="result-label">ניחשת:</span>
+            <span id="result-guessed" class="result-value"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">השנה האמיתית:</span>
+            <span id="result-actual" class="result-value highlight"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">שם השיר:</span>
+            <span id="result-song" class="result-value"></span>
+          </div>
+          <div class="result-row score-row">
+            <span class="result-label">נקודות (מרחק):</span>
+            <span id="result-points" class="result-value points"></span>
+          </div>
+        </div>
+        <button id="btn-next" class="btn btn-secondary" onclick="nextTurn()">
+          <span class="btn-text">⏭️ הבא</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 3: RESULTS ===== -->
+  <div id="screen-results" class="screen">
+    <div class="container">
+      <div class="results-header">
+        <div class="trophy">🏆</div>
+        <h1 class="results-title">סיום המשחק!</h1>
+      </div>
+
+      <div id="winner-card" class="winner-card glass">
+        <div class="winner-crown">👑</div>
+        <div class="winner-label">המנצח</div>
+        <div id="winner-name" class="winner-name"></div>
+        <div id="winner-score" class="winner-score"></div>
+      </div>
+
+      <div class="final-scores glass">
+        <h2 class="scores-title">טבלת ניקוד</h2>
+        <div id="final-scoreboard" class="final-scoreboard"></div>
+      </div>
+
+      <button class="btn btn-primary btn-large" onclick="resetGame()">
+        <span class="btn-text">🔄 משחק חדש</span>
+      </button>
+    </div>
+  </div>
+
+  <script src="songs.js"></script>
+  <script src="game.js"></script>
+</body>
+
+</html>
