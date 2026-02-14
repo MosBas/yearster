@@ -209,8 +209,8 @@ function submitGuess() {
     const actualYear = state.currentSong.year;
     const distance = Math.abs(guessedYear - actualYear);
 
-    // Exact match bonus: -5 points
-    const points = distance === 0 ? -5 : distance;
+    // Score = 100 - distance, exact match bonus +10 (= 110)
+    const points = distance === 0 ? 110 : Math.max(0, 100 - distance);
 
     // Update score
     state.scores[state.currentPlayerIndex] += points;
@@ -236,7 +236,7 @@ function showResult(guessed, actual, distance, points) {
     // Emoji & text based on accuracy
     let emoji, text;
     if (distance === 0) {
-        emoji = '🎯'; text = 'פגיעה מדויקת! בונוס -5 נקודות!';
+        emoji = '🎯'; text = 'פגיעה מדויקת! 110 נקודות!';
     } else if (distance <= 2) {
         emoji = '🔥'; text = 'כמעט מושלם!';
     } else if (distance <= 5) {
@@ -255,7 +255,7 @@ function showResult(guessed, actual, distance, points) {
     document.getElementById('result-actual').textContent = actual;
     document.getElementById('result-song').textContent =
         `${state.currentSong.title} - ${state.currentSong.artist}`;
-    document.getElementById('result-points').textContent = points < 0 ? `${points}` : `+${points}`;
+    document.getElementById('result-points').textContent = `+${points}`;
 
     // Update scoreboard with new score
     updateScoreboard();
@@ -298,19 +298,19 @@ function endGame() {
     clearSavedState();
     showScreen('screen-results');
 
-    // Find winner (lowest score)
-    const minScore = Math.min(...state.scores);
-    const winnerIndex = state.scores.indexOf(minScore);
+    // Find winner (highest score)
+    const maxScore = Math.max(...state.scores);
+    const winnerIndex = state.scores.indexOf(maxScore);
 
     document.getElementById('winner-name').textContent = state.players[winnerIndex];
-    document.getElementById('winner-score').textContent = `${minScore} נקודות`;
+    document.getElementById('winner-score').textContent = `${maxScore} נקודות`;
 
     // Build final scoreboard
     const ranked = state.players.map((name, i) => ({
         name,
         score: state.scores[i],
         index: i
-    })).sort((a, b) => a.score - b.score);
+    })).sort((a, b) => b.score - a.score);
 
     const scoreboard = document.getElementById('final-scoreboard');
     scoreboard.innerHTML = ranked.map((p, i) => `

@@ -53,9 +53,9 @@ Replaced the range slider for mobile friendliness:
 ### Scoring
 ```
 distance = Math.abs(guessed - actual)
-points = distance === 0 ? -5 : distance
+points = distance === 0 ? 110 : Math.max(0, 100 - distance)
 ```
-Lowest total score wins.
+Highest total score wins.
 
 ## How to Rebuild the Song Database
 ```bash
