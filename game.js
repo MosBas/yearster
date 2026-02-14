@@ -12,6 +12,58 @@ const state = {
 
 const EMOJIS = ['🎤', '🎸', '🥁', '🎹', '🎷'];
 const PLAYER_COLORS = ['#8b5cf6', '#ec4899', '#3b82f6', '#f59e0b', '#10b981'];
+const LS_KEY = 'yearster_game_state';
+
+// ===== LOCAL STORAGE =====
+function saveState() {
+    const data = {
+        players: state.players,
+        currentPlayerIndex: state.currentPlayerIndex,
+        currentRound: state.currentRound,
+        totalRounds: state.totalRounds,
+        scores: state.scores,
+        gameSongs: state.gameSongs,
+        currentSong: state.currentSong,
+        phase: document.getElementById('screen-game').classList.contains('active') ? 'game' :
+            document.getElementById('screen-results').classList.contains('active') ? 'results' : 'register'
+    };
+    try {
+        localStorage.setItem(LS_KEY, JSON.stringify(data));
+    } catch (e) { /* storage full or unavailable */ }
+}
+
+function clearSavedState() {
+    try { localStorage.removeItem(LS_KEY); } catch (e) { }
+}
+
+function loadState() {
+    try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        if (!data.players || data.players.length < 2) return false;
+
+        state.players = data.players;
+        state.scores = data.scores;
+        state.currentPlayerIndex = data.currentPlayerIndex;
+        state.currentRound = data.currentRound;
+        state.totalRounds = data.totalRounds;
+        state.gameSongs = data.gameSongs;
+        state.currentSong = data.currentSong;
+
+        if (data.phase === 'results') {
+            endGame();
+        } else if (data.phase === 'game') {
+            showScreen('screen-game');
+            startTurn();
+        } else {
+            return false;
+        }
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
 
 // ===== SCREEN MANAGEMENT =====
 function showScreen(screenId) {
@@ -44,6 +96,7 @@ function startGame() {
 
     showScreen('screen-game');
     startTurn();
+    saveState();
 }
 
 function shakeElement(el) {
@@ -161,6 +214,7 @@ function submitGuess() {
 
     // Update score
     state.scores[state.currentPlayerIndex] += points;
+    saveState();
 
     // Show result
     showResult(guessedYear, actualYear, distance, points);
@@ -233,6 +287,7 @@ function nextTurn() {
     }
 
     startTurn();
+    saveState();
 
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -240,6 +295,7 @@ function nextTurn() {
 
 // ===== END GAME =====
 function endGame() {
+    clearSavedState();
     showScreen('screen-results');
 
     // Find winner (lowest score)
@@ -269,6 +325,7 @@ function endGame() {
 
 // ===== RESET =====
 function resetGame() {
+    clearSavedState();
     state.players = [];
     state.scores = [];
     state.currentPlayerIndex = 0;
@@ -283,6 +340,12 @@ function resetGame() {
     }
 
     showScreen('screen-register');
+}
+
+function abandonGame() {
+    if (confirm('בטוח שאתם רוצים לצאת מהמשחק?')) {
+        resetGame();
+    }
 }
 
 // ===== KEYBOARD SUPPORT =====
@@ -328,4 +391,9 @@ function closeInstructions(event) {
 
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeInstructions();
+});
+
+// ===== RESTORE SAVED GAME ON LOAD =====
+window.addEventListener('DOMContentLoaded', () => {
+    loadState();
 });

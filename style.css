@@ -400,6 +400,26 @@ body {
   justify-content: flex-end;
 }
 
+.btn-abandon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: var(--transition);
+  padding: 0;
+}
+
+.btn-abandon:hover {
+  background: rgba(236, 72, 153, 0.15);
+  border-color: var(--accent-2);
+}
+
 .score-chip {
   background: var(--surface);
   border: 1px solid var(--border);
