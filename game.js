@@ -10,8 +10,8 @@ const state = {
     gameSongs: [],
 };
 
-const EMOJIS = ['🎤', '🎸', '🥁', '🎹'];
-const PLAYER_COLORS = ['#8b5cf6', '#ec4899', '#3b82f6', '#f59e0b'];
+const EMOJIS = ['🎤', '🎸', '🥁', '🎹', '🎷'];
+const PLAYER_COLORS = ['#8b5cf6', '#ec4899', '#3b82f6', '#f59e0b', '#10b981'];
 
 // ===== SCREEN MANAGEMENT =====
 function showScreen(screenId) {
@@ -22,7 +22,7 @@ function showScreen(screenId) {
 // ===== REGISTRATION & START =====
 function startGame() {
     const players = [];
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 5; i++) {
         const name = document.getElementById(`player-${i}`).value.trim();
         if (name) players.push(name);
     }
@@ -81,10 +81,8 @@ function startTurn() {
     document.getElementById('guess-section').style.display = '';
     document.getElementById('result-section').style.display = 'none';
 
-    // Reset slider
-    const slider = document.getElementById('year-slider');
-    slider.value = 2000;
-    document.getElementById('year-display').textContent = '2000';
+    // Reset year picker
+    setYear(2000);
 
     // Hide song name
     document.getElementById('song-cover').classList.remove('revealed');
@@ -126,14 +124,35 @@ function loadSpotifyEmbed(trackId) {
   `;
 }
 
-// ===== YEAR SLIDER =====
-document.getElementById('year-slider').addEventListener('input', function () {
-    document.getElementById('year-display').textContent = this.value;
-});
+// ===== YEAR PICKER =====
+let currentYear = 2000;
+
+function setYear(y) {
+    currentYear = Math.max(1970, Math.min(2025, y));
+    document.getElementById('year-value').value = currentYear;
+    document.getElementById('year-display').textContent = currentYear;
+    updateDecadeButtons();
+}
+
+function setDecade(decade) {
+    setYear(decade + 5);
+}
+
+function adjustYear(delta) {
+    setYear(currentYear + delta);
+}
+
+function updateDecadeButtons() {
+    const activeDecade = Math.floor(currentYear / 10) * 10;
+    document.querySelectorAll('.decade-btn').forEach(btn => {
+        const btnDecade = parseInt(btn.getAttribute('onclick').match(/\d+/)[0]);
+        btn.classList.toggle('active', btnDecade === activeDecade);
+    });
+}
 
 // ===== GUESS SUBMISSION =====
 function submitGuess() {
-    const guessedYear = parseInt(document.getElementById('year-slider').value);
+    const guessedYear = currentYear;
     const actualYear = state.currentSong.year;
     const distance = Math.abs(guessedYear - actualYear);
 
@@ -259,7 +278,7 @@ function resetGame() {
     state.currentSong = null;
 
     // Clear inputs
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 5; i++) {
         document.getElementById(`player-${i}`).value = '';
     }
 
@@ -296,4 +315,17 @@ shakeStyle.textContent = `
 `;
 document.head.appendChild(shakeStyle);
 
-// Trigger build
+// ===== INSTRUCTIONS MODAL =====
+function openInstructions() {
+    document.getElementById('instructions-modal').style.display = '';
+}
+
+function closeInstructions(event) {
+    if (!event || event.target === event.currentTarget) {
+        document.getElementById('instructions-modal').style.display = 'none';
+    }
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeInstructions();
+});

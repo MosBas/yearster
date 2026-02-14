@@ -21,6 +21,58 @@
     <div class="orb orb-3"></div>
   </div>
 
+  <!-- ===== INSTRUCTIONS MODAL ===== -->
+  <div id="instructions-modal" class="modal-overlay" style="display:none;" onclick="closeInstructions(event)">
+    <div class="modal-content glass" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeInstructions()">&times;</button>
+      <h2 class="modal-title">📖 איך משחקים?</h2>
+      <div class="instructions-body">
+        <div class="instruction-item">
+          <span class="instruction-icon">👥</span>
+          <div>
+            <strong>שחקנים</strong>
+            <p>2-4 שחקנים. הכניסו שמות ולחצו התחל.</p>
+          </div>
+        </div>
+        <div class="instruction-item">
+          <span class="instruction-icon">🎵</span>
+          <div>
+            <strong>האזנה</strong>
+            <p>בכל תור מושמע שיר באמצעות Spotify. שם השיר מוסתר!</p>
+          </div>
+        </div>
+        <div class="instruction-item">
+          <span class="instruction-icon">📅</span>
+          <div>
+            <strong>ניחוש</strong>
+            <p>בחרו את השנה שבה לדעתכם יצא השיר (1970-2025).</p>
+          </div>
+        </div>
+        <div class="instruction-item">
+          <span class="instruction-icon">📊</span>
+          <div>
+            <strong>ניקוד</strong>
+            <p>הניקוד = המרחק בשנים מהתשובה הנכונה. ככל שקרוב יותר — עדיף!</p>
+          </div>
+        </div>
+        <div class="instruction-item">
+          <span class="instruction-icon">🎯</span>
+          <div>
+            <strong>פגיעה מדויקת</strong>
+            <p>ניחוש מדויק של השנה = <strong>בונוס -5 נקודות!</strong></p>
+          </div>
+        </div>
+        <div class="instruction-item">
+          <span class="instruction-icon">🏆</span>
+          <div>
+            <strong>ניצחון</strong>
+            <p>אחרי 10 סיבובים, מי שצבר <strong>הכי מעט</strong> נקודות — מנצח!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== SCREEN 1: REGISTRATION ===== -->
   <div id="screen-register" class="screen active">
     <div class="container">
@@ -55,9 +107,17 @@
             <input type="text" id="player-4" class="player-input" placeholder="שחקן 4 (אופציונלי)" maxlength="15"
               autocomplete="off">
           </div>
+          <div class="player-input-row">
+            <span class="player-number">5</span>
+            <input type="text" id="player-5" class="player-input" placeholder="שחקן 5 (אופציונלי)" maxlength="15"
+              autocomplete="off">
+          </div>
         </div>
         <button id="btn-start" class="btn btn-primary btn-large" onclick="startGame()">
           <span class="btn-text">🎶 התחילו לשחק!</span>
+        </button>
+        <button class="btn btn-secondary" onclick="openInstructions()" style="margin-top: 12px;">
+          <span class="btn-text">📖 איך משחקים?</span>
         </button>
       </div>
     </div>
@@ -98,14 +158,30 @@
       <!-- Year Guess Section -->
       <div id="guess-section" class="guess-section glass">
         <label class="guess-label">באיזו שנה יצא השיר?</label>
-        <div class="year-slider-container">
-          <span class="year-bound">1970</span>
-          <input type="range" id="year-slider" class="year-slider" min="1970" max="2025" value="2000" step="1">
-          <span class="year-bound">2025</span>
+
+        <!-- Decade quick-select buttons -->
+        <div class="decade-buttons">
+          <button class="decade-btn" onclick="setDecade(1970)">70s</button>
+          <button class="decade-btn" onclick="setDecade(1980)">80s</button>
+          <button class="decade-btn" onclick="setDecade(1990)">90s</button>
+          <button class="decade-btn" onclick="setDecade(2000)">00s</button>
+          <button class="decade-btn" onclick="setDecade(2010)">10s</button>
+          <button class="decade-btn" onclick="setDecade(2020)">20s</button>
         </div>
-        <div class="year-display-container">
-          <span id="year-display" class="year-display">2000</span>
+
+        <!-- Year fine-tuning -->
+        <div class="year-picker">
+          <button class="year-btn year-btn-large" onclick="adjustYear(-5)">-5</button>
+          <button class="year-btn" onclick="adjustYear(-1)">-1</button>
+          <div class="year-display-container">
+            <span id="year-display" class="year-display">2000</span>
+          </div>
+          <button class="year-btn" onclick="adjustYear(1)">+1</button>
+          <button class="year-btn year-btn-large" onclick="adjustYear(5)">+5</button>
         </div>
+
+        <input type="hidden" id="year-value" value="2000">
+
         <button id="btn-guess" class="btn btn-primary" onclick="submitGuess()">
           <span class="btn-text">🎯 נחש!</span>
         </button>
