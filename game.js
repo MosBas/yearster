@@ -295,3 +295,5 @@ shakeStyle.textContent = `
   .shake { animation: shake 0.4s ease-in-out; }
 `;
 document.head.appendChild(shakeStyle);
+
+// Trigger build
