@@ -1,0 +1,18 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "build_songs.js",
+      "find_hebrew_ids.js",
+      "verify_songs.js",
+      "README.md",
+      "AGENTS.md",
+      ".gitignore",
+      ".git",
+      "public/**"
+    ]
+  }
+}
