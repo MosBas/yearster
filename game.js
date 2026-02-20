@@ -209,8 +209,16 @@ function submitGuess() {
     const actualYear = state.currentSong.year;
     const distance = Math.abs(guessedYear - actualYear);
 
-    // Score = 100 - distance, exact match bonus +10 (= 110)
-    const points = distance === 0 ? 110 : Math.max(0, 100 - distance);
+    // Score = 10 - distance, exact match bonus +2 (= 12)
+    // If distance > 10, score is 0.
+    let points = 0;
+    if (distance === 0) {
+        points = 12;
+    } else if (distance <= 10) {
+        points = 10 - distance;
+    } else {
+        points = 0;
+    }
 
     // Update score
     state.scores[state.currentPlayerIndex] += points;
@@ -236,7 +244,7 @@ function showResult(guessed, actual, distance, points) {
     // Emoji & text based on accuracy
     let emoji, text;
     if (distance === 0) {
-        emoji = '🎯'; text = 'פגיעה מדויקת! 110 נקודות!';
+        emoji = '🎯'; text = 'פגיעה מדויקת! 12 נקודות!';
     } else if (distance <= 2) {
         emoji = '🔥'; text = 'כמעט מושלם!';
     } else if (distance <= 5) {
