@@ -73,6 +73,21 @@
     </div>
   </div>
 
+  <!-- ===== JOIN GAME MODAL ===== -->
+  <div id="join-modal" class="modal-overlay" style="display:none;" onclick="closeJoinModal(event)">
+    <div class="modal-content glass" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeJoinModal()">&times;</button>
+      <h2 class="modal-title">🔗 הצטרפות למשחק</h2>
+      <div class="join-body">
+        <p>הכנס את קוד המשחק שקיבלת מהמארח:</p>
+        <input type="text" id="join-code-input" class="player-input" placeholder="ABCD" maxlength="4" style="text-align: center; font-size: 2rem; text-transform: uppercase;">
+        <button id="btn-confirm-join" class="btn btn-primary btn-large" style="margin-top: 20px;" onclick="joinOnlineGame()">
+          <span class="btn-text">🚀 הצטרף!</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== SCREEN 1: REGISTRATION ===== -->
   <div id="screen-register" class="screen active">
     <div class="container">
@@ -85,7 +100,7 @@
       </div>
 
       <div class="card glass">
-        <h2 class="card-title">שמות השחקנים</h2>
+        <h2 class="card-title">שמות השחקנים (משחק מקומי)</h2>
         <div class="players-form">
           <div class="player-input-row">
             <span class="player-number">1</span>
@@ -114,10 +129,45 @@
           </div>
         </div>
         <button id="btn-start" class="btn btn-primary btn-large" onclick="startGame()">
-          <span class="btn-text">🎶 התחילו לשחק!</span>
+          <span class="btn-text">🎶 התחילו לשחק מקומי!</span>
         </button>
-        <button class="btn btn-secondary" onclick="openInstructions()" style="margin-top: 12px;">
+        
+        <div class="divider"><span>או</span></div>
+        
+        <div class="online-actions">
+           <button class="btn btn-accent btn-large" onclick="createOnlineGame()">
+            <span class="btn-text">🌐 צור משחק אונליין</span>
+          </button>
+          <button class="btn btn-secondary btn-large" onclick="openJoinModal()" style="margin-top: 10px;">
+            <span class="btn-text">🔗 הצטרף למשחק קיים</span>
+          </button>
+        </div>
+
+        <button class="btn btn-secondary" onclick="openInstructions()" style="margin-top: 24px; width: 100%;">
           <span class="btn-text">📖 איך משחקים?</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 1.5: LOBBY ===== -->
+  <div id="screen-lobby" class="screen">
+    <div class="container">
+      <div class="card glass">
+        <h2 class="card-title">לובי משחק</h2>
+        <div class="game-code-box">
+          <span class="code-label">קוד המשחק:</span>
+          <span id="lobby-game-code" class="code-value">----</span>
+        </div>
+        <div id="lobby-players-list" class="lobby-players-list">
+          <!-- Players will be listed here -->
+        </div>
+        <p id="lobby-status-msg" class="lobby-status">ממתינים לשחקנים...</p>
+        <button id="btn-lobby-start" class="btn btn-primary btn-large" onclick="startOnlineGame()" style="display: none;">
+          <span class="btn-text">🚀 כולם כאן? בואו נתחיל!</span>
+        </button>
+        <button class="btn btn-secondary btn-large" onclick="leaveLobby()" style="margin-top: 12px;">
+          <span class="btn-text">🚪 צא מהחדר</span>
         </button>
       </div>
     </div>
@@ -128,6 +178,9 @@
     <div class="container">
       <!-- Top bar: round & scores -->
       <div class="game-top-bar">
+        <div id="online-game-indicator" class="online-indicator glass-sm" style="display: none;">
+          🌐 <span id="active-game-code"></span>
+        </div>
         <div class="round-info glass-sm">
           <span class="round-label">סיבוב</span>
           <span id="round-number" class="round-num">1</span>
@@ -244,6 +297,35 @@
   </div>
 
   <script src="songs.js"></script>
+  
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue, push, update, get, child, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    async function init() {
+      try {
+        // Fetch config automatically from Firebase Hosting reserved URL
+        const response = await fetch('/__/firebase/init.json');
+        const firebaseConfig = await response.json();
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Expose needed Firebase functions to window so game.js can use them
+        window.fb = {
+          db, ref, set, onValue, push, update, get, child, onDisconnect
+        };
+        
+        console.log("Firebase initialized automatically");
+      } catch (e) {
+        console.error("Firebase initialization failed. If running locally, you might need to hardcode the config or use firebase serve.", e);
+      }
+    }
+    
+    init();
+  </script>
+
   <script src="game.js"></script>
 </body>
 
